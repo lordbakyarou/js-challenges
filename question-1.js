@@ -49,7 +49,7 @@ const transformAwardsData = ({ awards }) => {
         awardData.winners = awardData.winners.map((winner) => {
             const researchKey = `${awardData.year}${awardData.category}${winner.research}`;
             const researchShare = researchCountMap.get(researchKey);
-            const share = 1 / (totalWinners * researchShare); //logic not working yet might fixed later
+            const share = 1 / (totalWinners * researchShare);
             return { name: winner.name, share: parseFloat(share.toFixed(4)) };
         });
 
@@ -58,10 +58,24 @@ const transformAwardsData = ({ awards }) => {
             year: awardData.year,
             winners: awardData.winners,
         });
+
+        console.log(prizes[0]);
     }
 
     return prizes;
 };
+
+function countOccurrences(map, valueToCount) {
+    let count = 0;
+
+    console.log(map, valueToCount);
+    for (const value of map.values()) {
+        if (value === valueToCount) {
+            count++;
+        }
+    }
+    return count;
+}
 
 console.log(transformAwardsData(awards));
 
