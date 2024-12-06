@@ -6,35 +6,61 @@ Question:
 
 const awards = require("./constants.js");
 
-// console.log(awards);
-
 const transformAwardsData = ({ awards }) => {
     //create a map to hold data.
     //use map since it has O(1) search TC
 
     const awardsMap = new Map();
+    const researchCountMap = new Map();
 
     //iterate through the map to create a new key and value pair
 
     for (const award of awards) {
         const keyForMap = `${award.year + award.category}`;
+        const researchKey = `${award.year}${award.category}${award.research}`;
 
         if (!awardsMap.has(keyForMap)) {
             awardsMap.set(keyForMap, {
                 category: award.category,
                 year: award.year,
-                winners: [{ name: award.name }],
+                winners: [{ name: award.name, research: award.research }],
             });
         } else {
-            awardsMap.get(keyForMap).winners.push({ name: award.name });
+            awardsMap
+                .get(keyForMap)
+                .winners.push({ name: award.name, research: award.research });
+        }
+        // Count research occurrences
+        if (!researchCountMap.has(researchKey)) {
+            researchCountMap.set(researchKey, 1);
+        } else {
+            researchCountMap.set(
+                researchKey,
+                researchCountMap.get(researchKey) + 1
+            );
         }
     }
 
-    awardsMap.forEach((value, key) => {
-        console.log(value);
-    });
+    const prizes = [];
+    for (const awardData of awardsMap.values()) {
+        const totalWinners = awardData.winners.length;
 
-    // return awardsMap;
+        // Calculate share for each winner
+        awardData.winners = awardData.winners.map((winner) => {
+            const researchKey = `${awardData.year}${awardData.category}${winner.research}`;
+            const researchShare = researchCountMap.get(researchKey);
+            const share = 1 / (totalWinners * researchShare); //logic not working yet might fixed later
+            return { name: winner.name, share: parseFloat(share.toFixed(4)) };
+        });
+
+        prizes.push({
+            category: awardData.category,
+            year: awardData.year,
+            winners: awardData.winners,
+        });
+    }
+
+    return prizes;
 };
 
 console.log(transformAwardsData(awards));
